@@ -43,5 +43,5 @@ def main(argv:list):
     else:
         print(result)
 
-if name == "main":
+if __name__ == "__main__":
     main(sys.argv)
