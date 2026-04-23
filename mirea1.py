@@ -9,10 +9,15 @@ import json
 file_name ='expenses.json'
 
 def load_data():
-    if not os.path.exists(file_name):
+    if os.path.exists(file_name) and os.path.getsize(file_name) > 0:
+        with open(file_name, 'r', encoding='utf-8') as f:
+             content = f.read()
+        if content.strip():
+            return json.loads(content)  
+        else:
+            return {'categories': [], 'expenses': []}
+        else:
         return {'categories': [], 'expenses': []}
-        try:
-            with open(file_name, 'r') as f:
-                    return json.load(f)
-        except Exception:
-             return {'categories': [], 'expenses': []}
+def save_data(data):
+     with open(file_name, 'w', encoding='utf-8')as f:
+            json.dump(data, f, ensure_ascii=False, indent=)
