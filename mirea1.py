@@ -22,10 +22,12 @@ def save_data(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
     with open(file_name, 'w', encoding='utf-8')as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+
 def format_cost(cost):
      if cost == int(cost):
         return int(cost)
      return cost 
+
 def error_exit(msg):
     print(f"Ошибка: {msg}")
     sys.exit(1)
@@ -40,14 +42,14 @@ def main():
     if cmd == "add-category":
         if len(sys.argv) < 3:
             error_exit("Не указано название категории")
-    
-    cat_name = ''.join(sys.argv[2:]).lower()
-    error_exit("Такая категория уже есть")
 
-    data['categories'].append(cat_name)
-    save_data(data)
-    print('Категория добвалена')
+        cat_name = ''.join(sys.argv[2:]).lower()
+        error_exit("Такая категория уже есть")
 
-elif cmd == "add":
-    if len(sys.argv) < 5:
-        error_exit("Неверный формат Использование: add <сумма> <категория> <название>")
+        data['categories'].append(cat_name)
+        save_data(data)
+        print('Категория добвалена')
+    elif cmd == "add":
+        if len(sys.argv) < 5:
+            error_exit("Неверный формат Использование: add <сумма> <категория> <название>")
+
