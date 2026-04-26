@@ -29,10 +29,9 @@ def find_category(data, name):
             return cat
     return None
 
-def format_cost(cost):
-    if cost == int(cost):
-        return str(int(cost))
-    return str(cost)
+def format_cost(n):
+    return int(n) if n == int(n) else n
+
 
 def cmd_add_category(data, args):
     if not args:
