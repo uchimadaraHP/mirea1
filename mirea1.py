@@ -98,7 +98,7 @@ def total_expenses(data, args):
     print(fmt(sum(e["cost"] for e in expenses)))
 
 def interactive_mode(data, commands):
-    print("--- Интерактивный режим (введите 'exit' для выхода) ---")
+    print("||| Интерактивный режим (введите 'exit' для выхода) |||")
     while True:
         try:
             user_input = input("» ").strip()
