@@ -7,17 +7,17 @@ import sys
 import os
 import json
 
-DATA_FILE = "expenses.json"
+data_file = "expenses.json"
 
 def load_data():
-    if not os.path.exists(DATA_FILE):
+    if not os.path.exists(data_file):
         return {"categories": [], "expenses": []}
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
+    with open(data_file, "r", encoding="utf-8") as f:
         data = json.load(f)
     return data
 
 def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
+    with open(data_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 def error_exit(message):
@@ -37,17 +37,15 @@ def format_cost(cost):
 
 def cmd_add_category(data, args):
     if not args:
-        print("Ошибка: укажите название категории")
-        sys.exit(1)
+        error_exit("Укажите название категории")
 
     cat = " ".join(args).strip()
 
     if cat == "":
-        print("Ошибка: название не может быть пустым")
-        sys.exit(1)
+        error_exit("Название не может быть пустым")
 
     if find_category(data, cat) is not None:
-        error_exit("такая категория уже существует")
+        error_exit("Такая категория уже существует")
 
     data["categories"].append(cat)
     save_data(data)
@@ -55,26 +53,22 @@ def cmd_add_category(data, args):
 
 def cmd_add(data, args):
     if len(args) < 3:
-        error_exit("укажите стоимость, категорию и название")
+        error_exit("Укажите стоимость, категорию и название")
 
     try:
         cost = float(args[0])
     except ValueError:
-        print("Ошибка: стоимость должна быть числом")
-        sys.exit(1)
-
-    if cost < 0:
-        error_exit("стоимость не может быть отрицательной")
+       error_exit("Стоимсоть должна быть числом")
 
     cat_input = args[1].strip()
     expense_name = " ".join(args[2:]).strip()
 
     if not expense_name:
-        error_exit("название расхода не может быть пустым")
+        error_exit("Название расхода не может быть пустым")
 
     found = find_category(data, cat_input)
     if found is None:
-        error_exit(f"категория '{cat_input}' не найдена, сначала добавьте её через add-category")
+        error_exit(f"Категория '{cat_input}' не найдена, сначала добавьте её через add-category")
 
     data["expenses"].append({
         "cost": cost,
@@ -89,7 +83,7 @@ def cmd_list(data, args):
         cat_input = " ".join(args)
         found = find_category(data, cat_input)
         if found is None:
-            error_exit(f"категория '{cat_input}' не найдена")
+            error_exit(f"Категория '{cat_input}' не найдена")
         expenses = [e for e in data["expenses"] if e["category"] == found]
     else:
         expenses = data["expenses"]
@@ -123,7 +117,7 @@ def cmd_total(data, args):
 
 def main():
     if len(sys.argv) < 2:
-        error_exit("укажите команду (add, add-category, list, total)")
+        error_exit("Укажите команду (add, add-category, list, total)")
 
     command = sys.argv[1]
     args = sys.argv[2:]
@@ -139,9 +133,9 @@ def main():
     elif command == "total":
         cmd_total(data, args)
     else:
-        error_exit(f"неизвестная команда '{command}'. Доступны: add, add-category, list, total")
+        error_exit(f"Неизвестная команда '{command}'. Доступны: add, add-category, list, total")
 
-if iopname == "main":
+if __name__ == "__main__":
     main()
   
 
