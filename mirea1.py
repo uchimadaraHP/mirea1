@@ -21,8 +21,7 @@ def save_data(data):
 
 def error(msg):
     print(f"Ошибка: {msg}")
-    # В интерактивном режиме мы не хотим выходить из программы совсем
-    # Поэтому мы просто выводим ошибку, но sys.exit(1) оставим для командной строки
+
 
 def find_cat(data, name):
     for c in data["categories"]:
@@ -129,7 +128,6 @@ def main():
         "total": total_expenses
     }
 
-    # Если аргументов нет — запускаем интерактивный режим
     if len(sys.argv) < 2:
         interactive_mode(data, commands)
     else:
