@@ -13,8 +13,7 @@ def load_data():
     if not os.path.exists(data_file):
         return {"categories": [], "expenses": []}
     with open(data_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data
+           return json.load(f)
 
 def save_data(data):
     with open(data_file, "w", encoding="utf-8") as f:
