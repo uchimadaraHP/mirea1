@@ -43,7 +43,7 @@ def cmd_add_category(data, args):
         error_exit("Название не может быть пустым")
 
     if find_category(data, cat) is not None:
-        error_exit("Такая категория уже существует")
+        error_exit("Категория уже существует")
 
     data["categories"].append(cat)
     save_data(data)
@@ -107,11 +107,7 @@ def cmd_total(data, args):
         print("0 трат")
         return
 
-    total = 0
-    for e in expenses:
-        total += e["cost"]
-
-    print(format_cost(total))
+    print(format_cost(sum(e["cost"]for e in expenses)))
 
 def main():
     if len(sys.argv) < 2:
