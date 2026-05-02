@@ -19,10 +19,9 @@ def save_data(data):
     with open(data_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-def error_exit(message, is_interactive=False):
+def error_exit(message):
     print(f"Ошибка: {message}")
-    if not is_interactive:
-        sys.exit(1)
+    sys.exit(1)
 
 def find_category(data, name):
     for cat in data["categories"]:
@@ -33,104 +32,90 @@ def find_category(data, name):
 def format_cost(n):
     return int(n) if n == int(n) else n
 
-def cmd_add_category(data, args, is_interactive=False):
+def cmd_add_category(data, args):
     if not args:
-        return error_exit("Укажите название категории", is_interactive)
+        error_exit("Укажите название категории")
+
     cat = " ".join(args).strip()
+
     if cat == "":
-        return error_exit("Название не может быть пустым", is_interactive)
+        error_exit("Название не может быть пустым")
+
     if find_category(data, cat) is not None:
-        return error_exit("Категория уже существует", is_interactive)
+        error_exit("Категория уже существует")
 
     data["categories"].append(cat)
     save_data(data)
     print(f"Категория '{cat}' добавлена")
 
-def cmd_add(data, args, is_interactive=False):
+def cmd_add(data, args):
     if len(args) < 3:
-        return error_exit("Укажите стоимость, категорию и название", is_interactive)
+        error_exit("Укажите стоимость, категорию и название")
+
     try:
         cost = float(args[0])
     except ValueError:
-       return error_exit("Стоимость должна быть числом", is_interactive)
+       error_exit("Стоимсоть должна быть числом")
 
     cat_input = args[1].strip()
     expense_name = " ".join(args[2:]).strip()
+
     if not expense_name:
-        return error_exit("Название расхода не может быть пустым", is_interactive)
+        error_exit("Название расхода не может быть пустым")
 
     found = find_category(data, cat_input)
     if found is None:
-        return error_exit(f"Категория '{cat_input}' не найдена", is_interactive)
+        error_exit(f"Категория '{cat_input}' не найдена, сначала добавьте её через add-category")
 
-    data["expenses"].append({"cost": cost, "category": found, "name": expense_name})
+    data["expenses"].append({
+        "cost": cost,
+        "category": found,
+        "name": expense_name
+    })
     save_data(data)
     print(f"Расход добавлен: {format_cost(cost)} | {found} | {expense_name}")
 
-def cmd_list(data, args, is_interactive=False):
-    expenses = data["expenses"]
+def cmd_list(data, args):
     if len(args) >= 1:
         cat_input = " ".join(args)
         found = find_category(data, cat_input)
         if found is None:
-            return error_exit(f"Категория '{cat_input}' не найдена", is_interactive)
-        expenses = [e for e in expenses if e["category"] == found]
-
-    if not expenses:
-        print("0 трат")
+            error_exit(f"Категория '{cat_input}' не найдена")
+        expenses = [e for e in data["expenses"] if e["category"] == found]
     else:
-        for e in expenses:
-            print(f"{format_cost(e['cost'])} | {e['category']} | {e['name']}")
+        expenses = data["expenses"]
 
-def cmd_total(data, args, is_interactive=False):
-    expenses = data["expenses"]
+    if len(expenses) == 0:
+        print("0 трат")
+        return
+
+    for e in expenses:
+        print(f"{format_cost(e['cost'])} | {e['category']} | {e['name']}")
+
+def cmd_total(data, args):
     if len(args) >= 1:
         cat_input = " ".join(args)
         found = find_category(data, cat_input)
         if found is None:
-            return error_exit(f"Категория '{cat_input}' не найдена", is_interactive)
-        expenses = [e for e in expenses if e["category"] == found]
-
-    if not expenses:
-        print("0 трат")
+            error_exit(f"категория '{cat_input}' не найдена")
+        expenses = [e for e in data["expenses"] if e["category"] == found]
     else:
-        print(format_cost(sum(e["cost"] for e in expenses)))
+        expenses = data["expenses"]
 
-def run_interactive(data):
-    print("--- Интерактивный режим (введите 'exit' для выхода) ---")
-    commands = {
-        "add": cmd_add,
-        "add-category": cmd_add_category,
-        "list": cmd_list,
-        "total": cmd_total
-    }
-    
-    while True:
-        try:
-            line = input("» ").strip()
-            if not line: continue
-            if line.lower() in ["exit", "quit", "выход"]: break
-            
-            parts = line.split()
-            cmd, args = parts[0], parts[1:]
-            
-            if cmd in commands:
-                commands[cmd](data, args, is_interactive=True)
-            else:
-                print(f"Неизвестная команда '{cmd}'")
-        except EOFError:
-            break
+    if len(expenses) == 0:
+        print("0 трат")
+        return
+
+    print(format_cost(sum(e["cost"]for e in expenses)))
 
 def main():
-    data = load_data()
-    
-   
     if len(sys.argv) < 2:
-        run_interactive(data)
-        return
+        error_exit("Укажите команду (add, add-category, list, total)")
 
     command = sys.argv[1]
     args = sys.argv[2:]
+
+    data = load_data()
 
     if command == "add-category":
         cmd_add_category(data, args)
@@ -141,7 +126,7 @@ def main():
     elif command == "total":
         cmd_total(data, args)
     else:
-        error_exit(f"Неизвестная команда '{command}'")
+        error_exit(f"Неизвестная команда '{command}'. Доступны: add, add-category, list, total")
 
 if __name__ == "__main__":
     main()
